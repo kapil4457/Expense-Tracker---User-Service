@@ -3,7 +3,9 @@ package com.example.userservice.consumer;
 import com.example.userservice.entities.UserInfo;
 import com.example.userservice.entities.UserInfoDto;
 import com.example.userservice.repository.UserRepository;
+import com.example.userservice.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -12,18 +14,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceConsumer {
 
-    private UserRepository userRepository;
-
-    AuthServiceConsumer(UserRepository userRepository){
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserService userService;
 
     @KafkaListener(topics="${spring.kafka.topic.name}",groupId = "${spring.kafka.consumer.group-id}")
     public void listen(UserInfoDto eventData){
         try{
-            UserInfo userInfo = eventData.transformToUserInfo();
-            userRepository.save(userInfo);
-            System.out.println("Hello");
+            userService.createOrUpdateUser(eventData);
         }catch(Exception ex){
             ex.printStackTrace();
         }
