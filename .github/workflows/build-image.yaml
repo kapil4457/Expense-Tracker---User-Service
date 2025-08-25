@@ -63,18 +63,18 @@ jobs:
         with:
           repository: kapil4457/Expense-Tracker---Configuration
           token: ${{ secrets.K8S_REPO_TOKEN }}
-          path: k8s-manifests
+          path: .
 
       - name: Update Kubernetes manifest
         run: |
           IMAGE_TAG=${{ needs.build-image.outputs.IMAGE_TAG }}
-          sed -i "s|image: kapil4457/expense-tracker-user-service:.*|image: kapil4457/expense-tracker-user-service:${IMAGE_TAG}|g" k8s-manifests/deployments/user-service.yaml
+          sed -i "s|image: kapil4457/expense-tracker-user-service:.*|image: kapil4457/expense-tracker-user-service:${IMAGE_TAG}|g" argocd-k8s-manifests/user-service/deployment.yaml
 
       - name: Commit and push changes
         run: |
-          cd k8s-manifests
+          cd argocd-k8s-manifests
           git config user.name "Kapil Soni"
           git config user.email "kapilsoni54768161@gmail.com"
           git add .
-          git commit -m "Update user-service image to $IMAGE_TAG" || echo "No changes to commit"
+          git commit -m "Update user-service image to ${IMAGE_TAG}" || echo "No changes to commit"
           git push
